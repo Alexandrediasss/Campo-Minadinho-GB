@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+
+# GBDK - Arquivos intermediários de compilação
+*.o
+*.lst
+*.map
+*.sym
+*.asm
+*.ihx
+*.cdb
+*.adb
+*.noi
+*.lk
+*.rel
+*.rst
+
+# ROMs compiladas
+# *.gb
+# *.gbc
