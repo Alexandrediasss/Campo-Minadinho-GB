@@ -112,6 +112,38 @@ void drawStartScreen(void) {
     move_sprite(0, 0, 0); // Oculta o cursor
 }
 
+void revealZeros(void) {
+    UINT8 changed = 1;
+    INT8 r, c, dr, dc, nr, nc;
+    while (changed) {
+        changed = 0;
+        for (r = 0; r < 10; r++) {
+            for (c = 0; c < 10; c++) {
+                if (minefield[r][c].isAppearing == 1 && minefield[r][c].hasBomb == 0 && minefield[r][c].neighbor == 0) {
+                    for (dr = -1; dr <= 1; dr++) {
+                        for (dc = -1; dc <= 1; dc++) {
+                            if (dr == 0 && dc == 0) continue;
+                            nr = r + dr;
+                            nc = c + dc;
+                            if (nr >= 0 && nr < 10 && nc >= 0 && nc < 10) {
+                                if (minefield[nr][nc].isAppearing == 0 && minefield[nr][nc].flag == 0) {
+                                    minefield[nr][nc].isAppearing = 1;
+                                    isShowingCount++;
+                                    minefield[nr][nc].neighbor = bombCounter(nr, nc);
+                                    unsigned char new_tile[1];
+                                    new_tile[0] = 3 + minefield[nr][nc].neighbor;
+                                    set_bkg_tiles((UINT8)nc + 5, (UINT8)nr + 4, 1, 1, new_tile);
+                                    changed = 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void main(void)
 {
     // PASSO 1: Carrega TODOS os gráficos na VRAM
@@ -230,6 +262,12 @@ void main(void)
                 }
                 
                 set_bkg_tiles(tile_x, tile_y, 1, 1, new_tile);
+                
+                // Se foi revelado um zero, abre em cadeia!
+                if (minefield[row][col].hasBomb == 0 && minefield[row][col].neighbor == 0) {
+                    revealZeros();
+                }
+
                 delay(200); 
             }
         }
