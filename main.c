@@ -155,7 +155,14 @@ void drawStartScreen(void) {
     unsigned char comecar_text[] = {17, 25, 23, 20, 18, 16, 27};
     set_bkg_tiles(6, 12, 7, 1, comecar_text);
 
-    move_sprite(0, 0, 0); // Oculta o cursor
+    // SAIR (IDs: S=30, A=16, I=22, R=27)
+    unsigned char sair_text[] = {30, 16, 22, 27};
+    set_bkg_tiles(8, 14, 4, 1, sair_text);
+
+    menu_option = 0;
+    cursor_x = 48; // tile x=5 (offset de sprite +8)
+    cursor_y = 112;
+    move_sprite(0, cursor_x, cursor_y); // Mostra o cursor
 }
 
 void revealZeros(void) {
@@ -247,10 +254,26 @@ void main(void)
         // Lógica da tela inicial
         if (current_state == 0)
         {
-            if (input & J_START || input & J_A)
-            {
-                current_state = 1;
-                resetGame();
+            if (input & J_UP && menu_option == 1) {
+                menu_option = 0;
+                cursor_y = 112;
+                move_sprite(0, cursor_x, cursor_y);
+                delay(150);
+            }
+            if (input & J_DOWN && menu_option == 0) {
+                menu_option = 1;
+                cursor_y = 128;
+                move_sprite(0, cursor_x, cursor_y);
+                delay(150);
+            }
+            if (input & J_A || input & J_START) {
+                if (menu_option == 0) {
+                    current_state = 1;
+                    resetGame();
+                } else {
+                    DISPLAY_OFF;
+                    while(1) { wait_vbl_done(); } // Trava o jogo simulando que desligou
+                }
                 delay(200);
             }
             wait_vbl_done();
