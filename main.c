@@ -14,6 +14,7 @@ Block minefield[10][10];
 UINT8 isShowingCount = 0;
 UINT8 isGaming = 0;
 UINT8 flagCount = 0;
+UINT8 current_state = 0;
 
 UINT8 cursor_x = 48;
 UINT8 cursor_y = 48;
@@ -80,6 +81,37 @@ void resetGame(void) {
     move_sprite(0, cursor_x, cursor_y);
 }
 
+void drawStartScreen(void) {
+    // Pinta a tela INTEIRA com o fundo liso
+    unsigned char full_map[360];
+    for (UINT16 i = 0; i < 360; i++) full_map[i] = 0;
+    
+    // Borda
+    for (UINT8 i = 0; i < 20; i++) {
+        full_map[i] = 1; // Top
+        full_map[17 * 20 + i] = 1; // Bottom
+    }
+    for (UINT8 i = 0; i < 18; i++) {
+        full_map[i * 20] = 1; // Left
+        full_map[i * 20 + 19] = 1; // Right
+    }
+    set_bkg_tiles(0, 0, 20, 18, full_map);
+
+    // CAMPO (IDs: C=17, A=16, M=23, P=26, O=25)
+    unsigned char campo_text[] = {17, 16, 23, 26, 25};
+    set_bkg_tiles(7, 5, 5, 1, campo_text);
+
+    // MINADINHO (IDs: M=23, I=22, N=24, A=16, D=19, I=22, N=24, H=21, O=25)
+    unsigned char minadinho_text[] = {23, 22, 24, 16, 19, 22, 24, 21, 25};
+    set_bkg_tiles(5, 7, 9, 1, minadinho_text);
+
+    // COMEÇAR (IDs: C=17, O=25, M=23, E=20, Ç=18, A=16, R=27)
+    unsigned char comecar_text[] = {17, 25, 23, 20, 18, 16, 27};
+    set_bkg_tiles(6, 12, 7, 1, comecar_text);
+
+    move_sprite(0, 0, 0); // Oculta o cursor
+}
+
 void main(void)
 {
     // PASSO 1: Carrega TODOS os gráficos na VRAM
@@ -99,12 +131,24 @@ void main(void)
     set_bkg_data(13, 1, bomb);        // ID 13
     set_bkg_data(14, 1, bomb_explosion); // ID 14
     set_bkg_data(15, 1, wrong_flag);  // ID 15
+    set_bkg_data(16, 1, letter_A);
+    set_bkg_data(17, 1, letter_C);
+    set_bkg_data(18, 1, letter_C_cedilla);
+    set_bkg_data(19, 1, letter_D);
+    set_bkg_data(20, 1, letter_E);
+    set_bkg_data(21, 1, letter_H);
+    set_bkg_data(22, 1, letter_I);
+    set_bkg_data(23, 1, letter_M);
+    set_bkg_data(24, 1, letter_N);
+    set_bkg_data(25, 1, letter_O);
+    set_bkg_data(26, 1, letter_P);
+    set_bkg_data(27, 1, letter_R);
 
     set_sprite_data(0, 1, cursor);
     set_sprite_tile(0, 0);
 
-    // PASSO 2: Inicia as variáveis e desenha o mapa
-    resetGame();
+    // Inicia na tela de Start
+    drawStartScreen();
 
     SHOW_BKG;
     SHOW_SPRITES;
@@ -113,6 +157,19 @@ void main(void)
     while (1)
     {
         UINT8 input = joypad();
+
+        // Lógica da tela inicial
+        if (current_state == 0)
+        {
+            if (input & J_START || input & J_A)
+            {
+                current_state = 1;
+                resetGame();
+                delay(200);
+            }
+            wait_vbl_done();
+            continue;
+        }
 
         // Verifica se o jogo acabou (Vitória ou Derrota)
         if (isGaming == 1)
