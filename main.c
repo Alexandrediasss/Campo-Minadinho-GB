@@ -58,6 +58,28 @@ void startGame(void) {
     }
 }
 
+void resetGame(void) {
+    startGame();
+
+    // Pinta a tela INTEIRA com o fundo liso
+    unsigned char full_map[360];
+    for (UINT16 i = 0; i < 360; i++) full_map[i] = 0;
+    set_bkg_tiles(0, 0, 20, 18, full_map);
+
+    // Desenha a Happy Face
+    unsigned char face_map[] = {2};
+    set_bkg_tiles(9, 1, 1, 1, face_map);
+
+    // Desenha o Tabuleiro
+    unsigned char board_map[100];
+    for (UINT16 i = 0; i < 100; i++) board_map[i] = 1;
+    set_bkg_tiles(5, 4, 10, 10, board_map);
+
+    cursor_x = 48;
+    cursor_y = 48;
+    move_sprite(0, cursor_x, cursor_y);
+}
+
 void main(void)
 {
     // PASSO 1: Carrega TODOS os gráficos na VRAM
@@ -78,26 +100,11 @@ void main(void)
     set_bkg_data(14, 1, bomb_explosion); // ID 14
     set_bkg_data(15, 1, wrong_flag);  // ID 15
 
-    // PASSO 2: Espalha as 10 bombas pelo array
-    startGame();
-
-    // Pinta a tela INTEIRA com o fundo liso
-    unsigned char full_map[360];
-    for (UINT16 i = 0; i < 360; i++) full_map[i] = 0;
-    set_bkg_tiles(0, 0, 20, 18, full_map);
-
-    // Desenha a Happy Face
-    unsigned char face_map[] = {2};
-    set_bkg_tiles(9, 1, 1, 1, face_map);
-
-    // Desenha o Tabuleiro
-    unsigned char board_map[100];
-    for (UINT16 i = 0; i < 100; i++) board_map[i] = 1;
-    set_bkg_tiles(5, 4, 10, 10, board_map);
-
     set_sprite_data(0, 1, cursor);
     set_sprite_tile(0, 0);
-    move_sprite(0, cursor_x, cursor_y);
+
+    // PASSO 2: Inicia as variáveis e desenha o mapa
+    resetGame();
 
     SHOW_BKG;
     SHOW_SPRITES;
@@ -106,6 +113,25 @@ void main(void)
     while (1)
     {
         UINT8 input = joypad();
+
+        // Verifica se o jogo acabou (Vitória ou Derrota)
+        if (isGaming == 1)
+        {
+            if (input & J_START || input & J_A)
+            {
+                resetGame();
+                delay(200);
+            }
+            wait_vbl_done();
+            continue;
+        }
+
+        // Condição de Vitória (90 blocos abertos + 10 bandeiras colocadas)
+        if (flagCount == 10 && isShowingCount == 90)
+        {
+            isGaming = 1; // Para o jogo e permite reiniciar
+            continue;
+        }
 
         // Movimento
         if (input & J_UP && cursor_y > 48) { cursor_y -= 8; delay(150); }
