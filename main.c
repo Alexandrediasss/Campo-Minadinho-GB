@@ -271,7 +271,8 @@ void main(void)
                     current_state = 1;
                     resetGame();
                 } else {
-                    reset(); // Reinicia o Game Boy
+                    DISPLAY_OFF;
+                    while(1) { wait_vbl_done(); } // Trava o jogo simulando que desligou
                 }
                 delay(200);
             }
