@@ -437,7 +437,7 @@ void main(void)
             }
         }
         if (input & J_DOWN) {
-            if (cursor_y == 16) { cursor_y = 32; cursor_x = 80; delay(150); }
+            if (cursor_y == 16) { cursor_y = 32; cursor_x = 88; delay(150); }
             else if (cursor_y < (32 + (ROWS-1)*16)) { cursor_y += 16; delay(150); }
         }
         if (input & J_LEFT && cursor_x > 24 && cursor_y >= 32) { cursor_x -= 16; delay(150); }
@@ -494,6 +494,8 @@ void main(void)
         // AÇÃO 2: COLOCAR/TIRAR BANDEIRA (Botão B)
         if (input & J_B)
         {
+            if (cursor_y == 16) continue;
+            
             UINT8 col = (cursor_x - 24) / 16;
             UINT8 row = (cursor_y - 32) / 16;
 
