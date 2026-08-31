@@ -61,34 +61,22 @@ void drawHUD(void) {
 
 UINT8 bombCounter(UINT8 r, UINT8 c) {
     UINT8 count = 0;
-    
-    if (r > 0) {
-        if (c > 0) {
-            if (minefield[r-1][c-1].hasBomb == 1) count++;
-        }
-        if (minefield[r-1][c].hasBomb == 1) count++;
-        if (c+1 < COLS) {
-            if (minefield[r-1][c+1].hasBomb == 1) count++;
-        }
-    }
-    
-    if (c > 0) {
-        if (minefield[r][c-1].hasBomb == 1) count++;
-    }
-    if (c+1 < COLS) {
-        if (minefield[r][c+1].hasBomb == 1) count++;
-    }
-    
-    if (r+1 < ROWS) {
-        if (c > 0) {
-            if (minefield[r+1][c-1].hasBomb == 1) count++;
-        }
-        if (minefield[r+1][c].hasBomb == 1) count++;
-        if (c+1 < COLS) {
-            if (minefield[r+1][c+1].hasBomb == 1) count++;
+    INT8 dr, dc;
+    for (dr = -1; dr <= 1; dr++) {
+        for (dc = -1; dc <= 1; dc++) {
+            if (dr == 0 && dc == 0) continue;
+            INT8 nr = r + dr;
+            INT8 nc = c + dc;
+            if (nr >= 0 && nr < ROWS) {
+                if (nc >= 0 && nc < COLS) {
+                    Block *b = &minefield[nr][nc];
+                    if (b->hasBomb == 1) {
+                        count++;
+                    }
+                }
+            }
         }
     }
-    
     return count;
 }
 
@@ -418,8 +406,8 @@ void main(void)
             continue;
         }
 
-        // Condição de Vitória (90 blocos abertos + 10 bandeiras colocadas)
-        if (flagCount == MINES && isShowingCount == (ROWS * COLS - MINES) && current_state == 1)
+        // PASSO 6: Verifica Win Condition
+        if (isShowingCount == (ROWS * COLS - MINES) && current_state == 1)
         {
             current_state = 3;
             delay(1000); // Pausa pra admirar
@@ -507,7 +495,7 @@ void main(void)
                     flagCount--;
                     draw_block(col, row, 151); // 151 = big_closed
                 }
-                else
+                else if (flagCount < MINES)
                 {
                     minefield[row][col].flag = 1;
                     flagCount++;
