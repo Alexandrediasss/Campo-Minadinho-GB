@@ -61,14 +61,34 @@ void drawHUD(void) {
 
 UINT8 bombCounter(UINT8 r, UINT8 c) {
     UINT8 count = 0;
-    if (r > 0 && c > 0 && minefield[r-1][c-1].hasBomb == 1) count++;
-    if (r > 0 && minefield[r-1][c].hasBomb == 1) count++;
-    if (r > 0 && c+1 < COLS && minefield[r-1][c+1].hasBomb == 1) count++;
-    if (c > 0 && minefield[r][c-1].hasBomb == 1) count++;
-    if (c+1 < COLS && minefield[r][c+1].hasBomb == 1) count++;
-    if (r+1 < ROWS && c > 0 && minefield[r+1][c-1].hasBomb == 1) count++;
-    if (r+1 < ROWS && minefield[r+1][c].hasBomb == 1) count++;
-    if (r+1 < ROWS && c+1 < COLS && minefield[r+1][c+1].hasBomb == 1) count++;
+    
+    if (r > 0) {
+        if (c > 0) {
+            if (minefield[r-1][c-1].hasBomb == 1) count++;
+        }
+        if (minefield[r-1][c].hasBomb == 1) count++;
+        if (c+1 < COLS) {
+            if (minefield[r-1][c+1].hasBomb == 1) count++;
+        }
+    }
+    
+    if (c > 0) {
+        if (minefield[r][c-1].hasBomb == 1) count++;
+    }
+    if (c+1 < COLS) {
+        if (minefield[r][c+1].hasBomb == 1) count++;
+    }
+    
+    if (r+1 < ROWS) {
+        if (c > 0) {
+            if (minefield[r+1][c-1].hasBomb == 1) count++;
+        }
+        if (minefield[r+1][c].hasBomb == 1) count++;
+        if (c+1 < COLS) {
+            if (minefield[r+1][c+1].hasBomb == 1) count++;
+        }
+    }
+    
     return count;
 }
 
